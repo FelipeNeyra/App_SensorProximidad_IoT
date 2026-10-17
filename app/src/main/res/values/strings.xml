@@ -1,3 +1,26 @@
 <resources>
     <string name="app_name">PrototipoEVA3</string>
+    <string name="permission_request_title">Permisos necesarios</string>
+    <string name="permission_request_message">Para permitir el acceso futuro a dispositivos Wi-Fi cercanos, Android solicitará el permiso correspondiente. Sin concederlo, no se puede continuar en esta versión.</string>
+    <string name="permission_denied_message">Se denegó el permiso para acceder a dispositivos Wi-Fi cercanos. Es necesario para esta función; la navegación está bloqueada. Puedes volver a solicitarlo.</string>
+    <string name="permission_blocked_indefinitely_message">El permiso para acceder a dispositivos Wi-Fi cercanos se volvió a denegar. La aplicación permanece abierta, pero la navegación está bloqueada.</string>
+    <string name="permission_retry">Volver a solicitar permisos</string>
+    <string name="permission_request_action">Solicitar permiso</string>
+    <string name="login_title">Iniciar sesión</string>
+    <string name="email_label">Correo electrónico</string>
+    <string name="password_label">Contraseña</string>
+    <string name="continue_label">Continuar</string>
+    <string name="configuration_title">Configuración</string>
+    <string name="bluetooth_label">Bluetooth</string>
+    <string name="wifi_label">Wi-Fi</string>
+    <string name="bluetooth_conceptual_message">Bluetooth es conceptual en este prototipo; no se establece una conexión.</string>
+    <string name="wifi_conceptual_message">El acceso a dispositivos Wi-Fi cercanos está habilitado donde el sistema lo requiere; la conexión real se implementará en una etapa posterior.</string>
+    <string name="values_label">Valores</string>
+    <string name="security_user_title">Vincular usuario de seguridad</string>
+    <string name="security_user_icon_description">Icono de usuario de seguridad</string>
+    <string name="security_user_email_label">Correo del usuario de seguridad</string>
+    <string name="security_user_phone_label">Teléfono del usuario de seguridad</string>
+    <string name="values_title">Valores de proximidad</string>
+    <string name="values_not_available">Los valores de sensores no están disponibles en este prototipo.</string>
+    <string name="back_to_configuration">Volver a Configuración</string>
 </resources>
