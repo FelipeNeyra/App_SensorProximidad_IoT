@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
@@ -25,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -35,10 +38,6 @@ import com.example.prototipoeva3.R
 fun ValuesScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
     var distance by remember { mutableStateOf(50f) } // 0 to 100 cm
 
-    // Thresholds:
-    // Very left (0..33) -> Red
-    // Center (34..66) -> Yellow
-    // Very right (67..100) -> Green
     val isRedActive = distance <= 33f
     val isYellowActive = distance > 33f && distance <= 66f
     val isGreenActive = distance > 66f
@@ -56,97 +55,117 @@ fun ValuesScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
         label = "green"
     )
 
-    Column(
+    val backgroundBrush = Brush.verticalGradient(
+        colors = listOf(
+            Color(0xFF42A5F5),
+            Color(0xFF1E88E5),
+            Color(0xFF0D47A1)
+        )
+    )
+
+    Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(backgroundBrush)
+            .padding(24.dp)
     ) {
-        // Top section: Back button
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Button(onClick = onBack) {
-                Text(stringResource(R.string.back_to_configuration))
-            }
-        }
-
-        // Center content: Traffic light and distance
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = stringResource(R.string.values_title),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-
-            // Traffic light housing (Red, Yellow, Green)
-            Surface(
-                shape = RoundedCornerShape(24.dp),
-                color = Color(0xFF1E1E1E),
-                shadowElevation = 8.dp,
-                modifier = Modifier.padding(8.dp)
+            // Top section: Back button
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                Button(
+                    onClick = onBack,
+                    shape = CircleShape,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                 ) {
-                    // Red Light (Left)
-                    Box(
-                        modifier = Modifier
-                            .size(56.dp)
-                            .clip(CircleShape)
-                            .background(redColor)
-                    )
-                    // Yellow Light (Middle)
-                    Box(
-                        modifier = Modifier
-                            .size(56.dp)
-                            .clip(CircleShape)
-                            .background(yellowColor)
-                    )
-                    // Green Light (Right)
-                    Box(
-                        modifier = Modifier
-                            .size(56.dp)
-                            .clip(CircleShape)
-                            .background(greenColor)
+                    Text(
+                        stringResource(R.string.back_to_configuration),
+                        color = Color(0xFF0D47A1),
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
 
-            // Distance value display
-            Text(
-                text = stringResource(R.string.distance_format, distance.toInt()),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
+            // Center content: Traffic light and distance
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.values_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
 
-        // Bottom section: Slider simulator
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.sensor_simulator_title),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium
-            )
-            Slider(
-                value = distance,
-                onValueChange = { distance = it },
-                valueRange = 0f..100f,
-                modifier = Modifier.fillMaxWidth()
-            )
+                // Traffic light housing (Red, Yellow, Green)
+                Surface(
+                    shape = RoundedCornerShape(24.dp),
+                    color = Color(0xFF1E1E1E),
+                    shadowElevation = 8.dp,
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(56.dp)
+                                .clip(CircleShape)
+                                .background(redColor)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .size(56.dp)
+                                .clip(CircleShape)
+                                .background(yellowColor)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .size(56.dp)
+                                .clip(CircleShape)
+                                .background(greenColor)
+                        )
+                    }
+                }
+
+                // Distance value display
+                Text(
+                    text = stringResource(R.string.distance_format, distance.toInt()),
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+
+            // Bottom section: Slider simulator
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.sensor_simulator_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.White
+                )
+                Slider(
+                    value = distance,
+                    onValueChange = { distance = it },
+                    valueRange = 0f..100f,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     }
 }
