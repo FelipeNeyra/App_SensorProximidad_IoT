@@ -36,4 +36,6 @@
     <string name="values_title">Valores de proximidad</string>
     <string name="values_not_available">Los valores de sensores no están disponibles en este prototipo.</string>
     <string name="back_to_configuration">Volver a Configuración</string>
+    <string name="distance_format">Distancia: %d cm</string>
+    <string name="sensor_simulator_title">Simulador Distancia</string>
 </resources>
