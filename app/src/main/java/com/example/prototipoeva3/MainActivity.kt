@@ -209,8 +209,6 @@ class MainActivity : ComponentActivity() {
                     deniedPermissions = deniedPermissions,
                     denialCount = permissionDenialCount,
                 )
-                val bluetoothMessage = stringResource(R.string.bluetooth_conceptual_message)
-                val wifiMessage = stringResource(R.string.wifi_conceptual_message)
                 val connectivityMessage = stringResource(
                     if (connectivityState == ConnectivityState.Connected) {
                         R.string.internet_connected_message
@@ -303,14 +301,52 @@ class MainActivity : ComponentActivity() {
                             )
 
                             AppScreen.CONFIGURATION -> ConfigurationScreen(
+                                isBluetoothGranted = isBluetoothGranted(),
+                                isWifiGranted = isWifiGranted(),
                                 onBluetoothClick = {
-                                    coroutineScope.launch {
-                                        snackbarHostState.showSnackbar(bluetoothMessage)
+                                    if (isBluetoothGranted()) {
+                                        coroutineScope.launch {
+                                            snackbarHostState.showSnackbar("Bluetooth está activo y con permisos concedidos para conectar con el Arduino.")
+                                        }
+                                    } else {
+                                        val btPerms = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                            arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT)
+                                        } else {
+                                            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+                                        }
+                                        val permanentlyDenied = btPerms.any { !shouldShowRequestPermissionRationale(it) && !isPermissionGranted(it) }
+                                        if (permanentlyDenied) {
+                                            val intent = Intent(
+                                                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                                Uri.fromParts("package", packageName, null),
+                                            )
+                                            startActivity(intent)
+                                        } else {
+                                            permissionPhase = PHASE_RETRY_REQUEST
+                                        }
                                     }
                                 },
                                 onWifiClick = {
-                                    coroutineScope.launch {
-                                        snackbarHostState.showSnackbar(wifiMessage)
+                                    if (isWifiGranted()) {
+                                        coroutineScope.launch {
+                                            snackbarHostState.showSnackbar("Wi-Fi está activo y operativo para conectar con Firebase.")
+                                        }
+                                    } else {
+                                        val wifiPerms = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                            arrayOf(Manifest.permission.NEARBY_WIFI_DEVICES)
+                                        } else {
+                                            emptyArray()
+                                        }
+                                        val permanentlyDenied = wifiPerms.any { !shouldShowRequestPermissionRationale(it) && !isPermissionGranted(it) }
+                                        if (permanentlyDenied) {
+                                            val intent = Intent(
+                                                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                                Uri.fromParts("package", packageName, null),
+                                            )
+                                            startActivity(intent)
+                                        } else {
+                                            permissionPhase = PHASE_RETRY_REQUEST
+                                        }
                                     }
                                 },
                                 onValuesClick = { currentScreenName = AppScreen.VALUES.name },
@@ -354,12 +390,35 @@ class MainActivity : ComponentActivity() {
     private fun isPermissionGranted(permission: String): Boolean =
         ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
 
-    private fun requiredRuntimePermissions(): Set<String> =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            setOf(Manifest.permission.NEARBY_WIFI_DEVICES)
+    private fun isBluetoothGranted(): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            isPermissionGranted(Manifest.permission.BLUETOOTH_SCAN) &&
+                isPermissionGranted(Manifest.permission.BLUETOOTH_CONNECT)
         } else {
-            emptySet()
+            isPermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION)
         }
+
+    private fun isWifiGranted(): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            isPermissionGranted(Manifest.permission.NEARBY_WIFI_DEVICES)
+        } else {
+            true
+        }
+
+    private fun requiredRuntimePermissions(): Set<String> {
+        val permissions = mutableSetOf<String>()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            permissions.add(Manifest.permission.BLUETOOTH_SCAN)
+            permissions.add(Manifest.permission.BLUETOOTH_CONNECT)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.NEARBY_WIFI_DEVICES)
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            permissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+        return permissions
+    }
 }
 
 private fun permissionStateForPhase(

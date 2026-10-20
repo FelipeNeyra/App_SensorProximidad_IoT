@@ -30,6 +30,8 @@ import com.example.prototipoeva3.R
 
 @Composable
 fun ConfigurationScreen(
+    isBluetoothGranted: Boolean,
+    isWifiGranted: Boolean,
     onBluetoothClick: () -> Unit,
     onWifiClick: () -> Unit,
     onValuesClick: () -> Unit,
@@ -47,19 +49,30 @@ fun ConfigurationScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(stringResource(R.string.configuration_title))
+        Text(stringResource(R.string.configuration_title), style = MaterialTheme.typography.titleLarge)
+        
         Button(onClick = onBluetoothClick, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(R.string.bluetooth_label))
+            Text(
+                if (isBluetoothGranted) stringResource(R.string.bluetooth_granted)
+                else stringResource(R.string.bluetooth_request)
+            )
         }
+        
         Button(onClick = onWifiClick, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(R.string.wifi_label))
+            Text(
+                if (isWifiGranted) stringResource(R.string.wifi_granted)
+                else stringResource(R.string.wifi_request)
+            )
         }
+        
         Button(onClick = onValuesClick, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(R.string.values_label))
         }
+        
         Button(onClick = onSignOut, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(R.string.logout_label))
         }
+        
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -68,6 +81,7 @@ fun ConfigurationScreen(
             SecurityUserIcon()
             Text(stringResource(R.string.security_user_title))
         }
+        
         OutlinedTextField(
             value = securityEmail,
             onValueChange = { securityEmail = it },
@@ -75,6 +89,7 @@ fun ConfigurationScreen(
             label = { Text(stringResource(R.string.security_user_email_label)) },
             singleLine = true
         )
+        
         OutlinedTextField(
             value = securityPhone,
             onValueChange = { securityPhone = it },
