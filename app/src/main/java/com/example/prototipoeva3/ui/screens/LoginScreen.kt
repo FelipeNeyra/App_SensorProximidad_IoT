@@ -6,12 +6,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,9 +22,16 @@ import androidx.compose.ui.unit.dp
 import com.example.prototipoeva3.R
 
 @Composable
-fun LoginScreen(onContinue: () -> Unit, modifier: Modifier = Modifier) {
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
+fun LoginScreen(
+    onSignIn: (email: String, password: String) -> Unit,
+    isLoading: Boolean,
+    message: String?,
+    connectivityMessage: String,
+    permissionInformation: String,
+    modifier: Modifier = Modifier,
+) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
     Column(
         modifier = modifier
@@ -33,6 +41,8 @@ fun LoginScreen(onContinue: () -> Unit, modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = stringResource(R.string.login_title))
+        Text(text = connectivityMessage)
+        Text(text = permissionInformation)
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -48,8 +58,17 @@ fun LoginScreen(onContinue: () -> Unit, modifier: Modifier = Modifier) {
             visualTransformation = PasswordVisualTransformation(),
             singleLine = true
         )
-        Button(onClick = onContinue, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(R.string.continue_label))
+        if (message != null) Text(text = message)
+        Button(
+            onClick = {
+                onSignIn(email, password)
+                password = ""
+            },
+            enabled = !isLoading,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            if (isLoading) CircularProgressIndicator()
+            else Text(stringResource(R.string.continue_label))
         }
     }
 }

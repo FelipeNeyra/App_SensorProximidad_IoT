@@ -4,9 +4,15 @@ package com.example.prototipoeva3.permissions
 sealed interface PermissionState {
     data object Ready : PermissionState
 
-    data class Requesting(val isRetry: Boolean) : PermissionState
+    data class Requesting(
+        val isRetry: Boolean,
+        val priorDenials: Int = if (isRetry) 1 else 0,
+    ) : PermissionState
 
-    data class BlockedRetryable(val deniedPermissions: Set<String>) : PermissionState
+    data class BlockedRetryable(
+        val deniedPermissions: Set<String>,
+        val denialCount: Int = 1,
+    ) : PermissionState
 
     data class BlockedIndefinitely(val deniedPermissions: Set<String>) : PermissionState
 }
@@ -28,11 +34,9 @@ fun nextPermissionState(
     val denied = result.filterValues { granted -> !granted }.keys
     if (denied.isEmpty()) return PermissionState.Ready
 
-    return if (current.isRetry) {
-        PermissionState.BlockedIndefinitely(denied)
-    } else {
-        PermissionState.BlockedRetryable(denied)
-    }
+    val denialCount = current.priorDenials + 1
+    return if (denialCount > 2) PermissionState.BlockedIndefinitely(denied)
+    else PermissionState.BlockedRetryable(denied, denialCount)
 }
 
 /** Solo se permite navegar cuando todos los permisos aplicables están concedidos. */

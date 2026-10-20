@@ -1,0 +1,27 @@
+mutation CreateSeedData @transaction @auth(expr: "auth.token.admin == true") {
+  location_insertMany(data: [
+    { name: "Warehouse Alpha", address: "123 Industrial Way", description: "Main storage facility" },
+    { name: "Lab Beta", address: "456 Science Rd", description: "Primary testing lab" },
+    { name: "Station Gamma", address: "789 Peak Trail", description: "Remote monitoring outpost" }
+  ])
+  project_insertMany(data: [
+    { name: "Infrastructure Upgrade", startDate: "2023-01-01" },
+    { name: "Sensor Calibration Project", startDate: "2023-05-15" },
+    { name: "Efficiency Research", startDate: "2024-02-10" }
+  ])
+  sensor_insertMany(data: [
+    { type: "Temperature", status: "Active", lastPingAt: "2024-05-20T10:00:00Z", batteryLevel: 95 },
+    { type: "Humidity", status: "Maintenance", lastPingAt: "2024-05-20T09:30:00Z", batteryLevel: 45 },
+    { type: "Pressure", status: "Active", lastPingAt: "2024-05-20T10:05:00Z", batteryLevel: 80 },
+    { type: "Temperature", status: "Offline", lastPingAt: "2024-05-19T14:00:00Z", batteryLevel: 0 }
+  ])
+  metric_insertMany(data: [
+    { timestamp: "2024-05-20T10:00:00Z", value: 22.5, unitOfMeasure: "Celsius", sensor: { id: "00000000-0000-0000-0000-000000000001" } },
+    { timestamp: "2024-05-20T10:01:00Z", value: 22.6, unitOfMeasure: "Celsius", sensor: { id: "00000000-0000-0000-0000-000000000001" } },
+    { timestamp: "2024-05-20T10:00:00Z", value: 45.0, unitOfMeasure: "Percentage", sensor: { id: "00000000-0000-0000-0000-000000000002" } }
+  ])
+  alert_insertMany(data: [
+    { severity: "High", message: "Overheating detected", createdAt: "2024-05-20T10:10:00Z", sensor: { id: "00000000-0000-0000-0000-000000000001" } },
+    { severity: "Low", message: "Low battery warning", createdAt: "2024-05-20T09:00:00Z", sensor: { id: "00000000-0000-0000-0000-000000000002" } }
+  ])
+}

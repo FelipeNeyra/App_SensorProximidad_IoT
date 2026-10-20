@@ -1,0 +1,114 @@
+mutation CreateAlerts @auth(level: USER) {
+  alert_insert(data: {
+    severity: "High",
+    message: "Battery low",
+    createdAt_expr: "request.time",
+    sensorId: "00000000-0000-0000-0000-000000000000"
+  })
+}
+
+mutation UpdateAlert($id: UUID!, $resolvedAt: Timestamp) @auth(level: USER) {
+  alert_update(id: $id, data: { resolvedAt: $resolvedAt })
+}
+
+mutation DeleteAlert($id: UUID!) @auth(level: USER) {
+  alert_delete(id: $id)
+}
+
+query GetAlert($id: UUID!) @auth(level: USER) {
+  alert(id: $id) { severity message createdAt resolvedAt }
+}
+
+query ListAlerts @auth(level: USER) {
+  alerts { severity message createdAt }
+}
+
+mutation CreateLocation @auth(level: PUBLIC, insecureReason: "Publicly readable/writable location directory") {
+  location_insert(data: { name: "Warehouse A", address: "123 Main St" })
+}
+
+mutation UpdateLocation($id: UUID!, $description: String) @auth(level: PUBLIC, insecureReason: "Publicly writable location directory") {
+  location_update(id: $id, data: { description: $description })
+}
+
+mutation DeleteLocation($id: UUID!) @auth(level: PUBLIC, insecureReason: "Publicly writable location directory") {
+  location_delete(id: $id)
+}
+
+query GetLocation($id: UUID!) @auth(level: PUBLIC, insecureReason: "Public location data") {
+  location(id: $id) { name address description }
+}
+
+query ListLocations @auth(level: PUBLIC, insecureReason: "Public location data") {
+  locations { name address }
+}
+
+mutation CreateMetric @auth(level: USER) {
+  metric_insert(data: {
+    timestamp_expr: "request.time",
+    value: 23.5,
+    unitOfMeasure: "Celsius",
+    sensorId: "00000000-0000-0000-0000-000000000000"
+  })
+}
+
+mutation UpdateMetric($id: UUID!, $value: Float) @auth(level: USER) {
+  metric_update(id: $id, data: { value: $value })
+}
+
+mutation DeleteMetric($id: UUID!) @auth(level: USER) {
+  metric_delete(id: $id)
+}
+
+query GetMetric($id: UUID!) @auth(level: USER) {
+  metric(id: $id) { timestamp value unitOfMeasure }
+}
+
+query ListMetrics @auth(level: USER) {
+  metrics { timestamp value }
+}
+
+mutation CreateProject @auth(level: PUBLIC, insecureReason: "Public project tracking") {
+  project_insert(data: { name: "Alpha Solar", startDate: "2023-01-01" })
+}
+
+mutation UpdateProject($id: UUID!, $endDate: Date) @auth(level: PUBLIC, insecureReason: "Public project tracking") {
+  project_update(id: $id, data: { endDate: $endDate })
+}
+
+mutation DeleteProject($id: UUID!) @auth(level: PUBLIC, insecureReason: "Public project tracking") {
+  project_delete(id: $id)
+}
+
+query GetProject($id: UUID!) @auth(level: PUBLIC, insecureReason: "Public project data") {
+  project(id: $id) { name startDate endDate }
+}
+
+query ListProjects @auth(level: PUBLIC, insecureReason: "Public project data") {
+  projects { name }
+}
+
+mutation CreateSensor @auth(level: USER) {
+  sensor_insert(data: {
+    type: "Temperature",
+    status: "Online",
+    lastPingAt_expr: "request.time",
+    batteryLevel: 100
+  })
+}
+
+mutation UpdateSensor($id: UUID!, $status: String) @auth(level: USER) {
+  sensor_update(id: $id, data: { status: $status })
+}
+
+mutation DeleteSensor($id: UUID!) @auth(level: USER) {
+  sensor_delete(id: $id)
+}
+
+query GetSensor($id: UUID!) @auth(level: USER) {
+  sensor(id: $id) { type status lastPingAt batteryLevel }
+}
+
+query ListSensors @auth(level: USER) {
+  sensors { type status }
+}

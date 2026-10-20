@@ -47,9 +47,20 @@ class PermissionFlowTest {
     @Test
     fun denialAfterRetryTransitionsToIndefiniteBlock() {
         assertEquals(
-            PermissionState.BlockedIndefinitely(setOf("permission")),
+            PermissionState.BlockedRetryable(setOf("permission"), denialCount = 2),
             nextPermissionState(
                 PermissionState.Requesting(isRetry = true),
+                mapOf("permission" to false)
+            )
+        )
+    }
+
+    @Test
+    fun thirdDenialTransitionsToIndefiniteBlock() {
+        assertEquals(
+            PermissionState.BlockedIndefinitely(setOf("permission")),
+            nextPermissionState(
+                PermissionState.Requesting(isRetry = true, priorDenials = 2),
                 mapOf("permission" to false)
             )
         )

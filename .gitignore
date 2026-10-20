@@ -13,3 +13,36 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Firebase client configuration can expose project identifiers and API keys.
+/google-services.json
+/app/google-services.json
+.firebaserc
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Local environment and credential files.
+.env
+.env.*
+!.env.example
+*.secrets
+*.secret
+secrets.properties
+credentials.properties
+keystore.properties
+key.properties
+*service-account*.json
+*-firebase-adminsdk-*.json
+
+# Signing keys, certificates, and private key material.
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.ppk
+*.pem
+*.key
+id_rsa
+id_ed25519

@@ -19,6 +19,7 @@ fun PermissionBlockedScreen(
     isIndefinite: Boolean,
     isInitialRequest: Boolean,
     onRetry: () -> Unit,
+    onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -38,7 +39,11 @@ fun PermissionBlockedScreen(
                 }
             )
         )
-        if (!isIndefinite) {
+        if (isIndefinite) {
+            Button(onClick = onOpenSettings, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.permission_open_settings))
+            }
+        } else {
             Button(onClick = onRetry, modifier = Modifier.fillMaxWidth()) {
                 Text(
                     stringResource(

@@ -1,0 +1,36 @@
+type Location @table {
+  name: String!
+  address: String
+  description: String
+}
+
+type Project @table {
+  name: String!
+  startDate: Date
+  endDate: Date
+}
+
+type Sensor @table {
+  type: String!
+  status: String!
+  lastPingAt: Timestamp!
+  firmwareVersion: String
+  batteryLevel: Int
+  location: Location
+  project: Project
+}
+
+type Metric @table {
+  timestamp: Timestamp!
+  value: Float!
+  unitOfMeasure: String
+  sensor: Sensor!
+}
+
+type Alert @table {
+  severity: String!
+  message: String!
+  createdAt: Timestamp!
+  resolvedAt: Timestamp
+  sensor: Sensor!
+}

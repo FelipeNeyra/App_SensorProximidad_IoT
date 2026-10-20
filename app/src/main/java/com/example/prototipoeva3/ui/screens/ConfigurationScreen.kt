@@ -33,6 +33,7 @@ fun ConfigurationScreen(
     onBluetoothClick: () -> Unit,
     onWifiClick: () -> Unit,
     onValuesClick: () -> Unit,
+    onSignOut: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var securityEmail by rememberSaveable { mutableStateOf("") }
@@ -55,6 +56,9 @@ fun ConfigurationScreen(
         }
         Button(onClick = onValuesClick, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(R.string.values_label))
+        }
+        Button(onClick = onSignOut, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(R.string.logout_label))
         }
         Row(
             modifier = Modifier.fillMaxWidth(),

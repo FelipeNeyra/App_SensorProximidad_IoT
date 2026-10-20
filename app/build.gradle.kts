@@ -1,6 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    id("org.jetbrains.kotlin.plugin.serialization")
+    // Add the Google services Gradle plugin
+    id("com.google.gms.google-services")
+
 }
 
 android {
@@ -52,4 +56,14 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:35.0.2"))
+
+    // Authentication is the only Firebase product used by this feature.
+    implementation("com.google.firebase:firebase-auth")
+
+    // Build support for the existing generated connector; this feature does not call it.
+    implementation("com.google.firebase:firebase-dataconnect:18.0.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 }
