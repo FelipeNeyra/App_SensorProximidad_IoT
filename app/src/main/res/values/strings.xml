@@ -42,4 +42,17 @@
     <string name="bluetooth_request">Bluetooth: Solicitar permiso / Habilitar</string>
     <string name="wifi_granted">Wi-Fi: Permiso concedido (Activo)</string>
     <string name="wifi_request">Wi-Fi: Solicitar permiso / Habilitar</string>
+
+    <!-- Firestore & Parking Simulation -->
+    <string name="auto_save_label">Guardar automáticamente en Firestore</string>
+    <string name="sensor_location_title">Ubicación del sensor:</string>
+    <string name="sensor_frontal">Frontal</string>
+    <string name="sensor_trasero">Trasero</string>
+    <string name="parking_note_label">Nota de aparcamiento / punto</string>
+    <string name="parking_note_hint">Ej. Plaza A-12, Entrada</string>
+    <string name="tracking_active_status">Seguimiento activo: Ajustando distancia (%d cm)...</string>
+    <string name="tracking_idle_status">Mueve el slider para medir y registrar aparcamiento</string>
+    <string name="saving_firestore_status">Guardando medición en colección \'Aparcamiento\'...</string>
+    <string name="saved_firestore_success">Guardado en Firestore: %s</string>
+    <string name="saved_firestore_error">No se pudo guardar en Firestore</string>
 </resources>

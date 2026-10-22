@@ -60,8 +60,10 @@ dependencies {
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:35.0.2"))
 
-    // Authentication is the only Firebase product used by this feature.
+    // Authentication and Firestore for IoT parking tracking
     implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.1")
 
     // Build support for the existing generated connector; this feature does not call it.
     implementation("com.google.firebase:firebase-dataconnect:18.0.1")
