@@ -55,4 +55,17 @@
     <string name="saving_firestore_status">Guardando medición en colección \'Aparcamiento\'...</string>
     <string name="saved_firestore_success">Guardado en Firestore: %s</string>
     <string name="saved_firestore_error">No se pudo guardar en Firestore</string>
+    <string name="sudden_change_alert_title">¡Alerta de Cambio Brusco!</string>
+    <string name="sudden_change_detected_status">¡Cambio brusco! Caída de %1$d cm en %2$d ms. Registrando...</string>
+    <string name="saved_sudden_change_success">Registrado en \'Cambio_Brusco\': %s</string>
+
+    <!-- Security User Linking -->
+    <string name="link_security_user_button">Vincular Usuario</string>
+    <string name="unlink_security_user_button">Desvincular Usuario</string>
+    <string name="security_user_linked_status">Usuario de seguridad vinculado: %s</string>
+    <string name="security_user_unlinked_status">No hay ningún usuario de seguridad vinculado.</string>
+    <string name="security_user_fields_required">Debes ingresar tanto el correo como el teléfono del usuario de seguridad.</string>
+    <string name="security_user_not_in_auth">El correo del usuario de seguridad no está registrado en Firebase Authentication.</string>
+    <string name="security_user_linked_success">Usuario de seguridad vinculado exitosamente.</string>
+    <string name="security_user_unlinked_success">Usuario de seguridad desvinculado.</string>
 </resources>

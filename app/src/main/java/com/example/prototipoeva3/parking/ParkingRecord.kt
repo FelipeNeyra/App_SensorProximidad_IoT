@@ -1,5 +1,7 @@
 package com.example.prototipoeva3.parking
 
+import com.google.firebase.Timestamp
+
 data class ParkingRecord(
     val id: String,
     val userId: String,
@@ -8,7 +10,7 @@ data class ParkingRecord(
     val estado: String,
     val ubicacionModo: String,
     val nota: String,
-    val timestamp: Long,
+    val timestamp: Timestamp,
 ) {
     fun toMap(): Map<String, Any> {
         return mapOf(

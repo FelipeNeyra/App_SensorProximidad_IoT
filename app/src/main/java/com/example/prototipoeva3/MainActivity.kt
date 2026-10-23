@@ -356,6 +356,19 @@ class MainActivity : ComponentActivity() {
                                     authState = AuthenticationState.SignedOut
                                     authMessage = getString(R.string.auth_signed_out_message)
                                 },
+                                onCheckSecurityUserExists = { secEmail, onResult ->
+                                    coroutineScope.launch {
+                                        val result = authRepository.checkUserExistsInAuth(secEmail)
+                                        onResult(result.getOrDefault(false))
+                                    }
+                                },
+                                onLinkSecurityUser = { secEmail ->
+                                    authRepository.linkSecurityUser(secEmail)
+                                },
+                                onUnlinkSecurityUser = {
+                                    authRepository.unlinkSecurityUser()
+                                },
+                                linkedSecurityEmail = authRepository.getLinkedSecurityUserEmail(),
                                 modifier = Modifier.fillMaxSize().padding(innerPadding),
                             )
 

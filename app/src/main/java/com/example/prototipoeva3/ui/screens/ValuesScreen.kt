@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -35,6 +34,8 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -58,13 +59,18 @@ fun ValuesScreen(
     modifier: Modifier = Modifier,
     parkingRepository: ParkingRepository = remember { FirebaseParkingRepository() },
 ) {
-    var distance by remember { mutableStateOf(50f) } // 0 to 100 cm
+    var distance by remember { mutableFloatStateOf(50f) } // 0 to 100 cm
     var isTracking by remember { mutableStateOf(false) }
     var autoSaveEnabled by remember { mutableStateOf(true) }
     var selectedSensorLocation by remember { mutableStateOf("Frontal") }
     var parkingNote by remember { mutableStateOf("") }
     var saveStatusMessage by remember { mutableStateOf<String?>(null) }
     var isSaving by remember { mutableStateOf(false) }
+
+    // Tracking states for abrupt distance reduction detection (< 1 second)
+    var dragStartDistance by remember { mutableFloatStateOf(50f) }
+    var dragStartTimeMs by remember { mutableLongStateOf(0L) }
+    var suddenChangeTriggeredForCurrentDrag by remember { mutableStateOf(false) }
 
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
@@ -95,6 +101,7 @@ fun ValuesScreen(
     )
 
     val defaultSavedSuccessPattern = stringResource(R.string.saved_firestore_success, "")
+    val defaultSavedSuddenChangePattern = stringResource(R.string.saved_sudden_change_success, "")
 
     Box(
         modifier = modifier
@@ -183,8 +190,8 @@ fun ValuesScreen(
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = when {
-                        isTracking -> Color(0xFFFF8F00)
                         isSaving -> Color(0xFF1565C0)
+                        isTracking -> Color(0xFFFF8F00)
                         saveStatusMessage != null -> Color(0xFF2E7D32)
                         else -> Color(0x33FFFFFF)
                     },
@@ -207,11 +214,11 @@ fun ValuesScreen(
                     }
                     Text(
                         text = when {
+                            isSaving -> stringResource(R.string.saving_firestore_status)
                             isTracking -> stringResource(
                                 R.string.tracking_active_status,
                                 distance.toInt(),
                             )
-                            isSaving -> stringResource(R.string.saving_firestore_status)
                             saveStatusMessage != null -> saveStatusMessage!!
                             else -> stringResource(R.string.tracking_idle_status)
                         },
@@ -315,17 +322,58 @@ fun ValuesScreen(
                         ),
                     )
 
-                    // 4. Slider: Proximity Distance Variation
+                    // 4. Slider: Proximity Distance Variation & Sudden Change Detection (<1s)
                     Column(modifier = Modifier.fillMaxWidth()) {
                         Slider(
                             value = distance,
                             onValueChange = { newDistance ->
+                                val now = System.currentTimeMillis()
+                                if (!isTracking) {
+                                    isTracking = true
+                                    dragStartDistance = distance
+                                    dragStartTimeMs = now
+                                    suddenChangeTriggeredForCurrentDrag = false
+                                }
+
+                                val dropCm = dragStartDistance - newDistance
+                                val timeDelta = now - dragStartTimeMs
+
+                                // Check for sudden abrupt distance reduction (< 1 second and drop >= 20 cm)
+                                if (!suddenChangeTriggeredForCurrentDrag && dropCm >= 20f && timeDelta in 1..1000L) {
+                                    suddenChangeTriggeredForCurrentDrag = true
+                                    val startDist = dragStartDistance
+                                    val deltaMs = timeDelta
+                                    coroutineScope.launch {
+                                        isSaving = true
+                                        val result = parkingRepository.saveSuddenChangeRecord(
+                                            initialDistanceCm = startDist,
+                                            finalDistanceCm = newDistance,
+                                            timeDeltaMs = deltaMs,
+                                            ubicacionModo = selectedSensorLocation,
+                                            nota = parkingNote,
+                                        )
+                                        isSaving = false
+                                        saveStatusMessage = result.fold(
+                                            onSuccess = { record ->
+                                                defaultSavedSuddenChangePattern.format(record.id)
+                                            },
+                                            onFailure = {
+                                                "Error en Cambio_Brusco: ${it.localizedMessage}"
+                                            },
+                                        )
+                                    }
+                                } else if (newDistance > distance) {
+                                    // Distance increased: reset reference point for sudden drop evaluation
+                                    dragStartDistance = newDistance
+                                    dragStartTimeMs = now
+                                    suddenChangeTriggeredForCurrentDrag = false
+                                }
+
                                 distance = newDistance
-                                isTracking = true
                             },
                             onValueChangeFinished = {
                                 isTracking = false
-                                if (autoSaveEnabled) {
+                                if (autoSaveEnabled && !suddenChangeTriggeredForCurrentDrag) {
                                     coroutineScope.launch {
                                         isSaving = true
                                         val result = parkingRepository.saveParkingRecord(

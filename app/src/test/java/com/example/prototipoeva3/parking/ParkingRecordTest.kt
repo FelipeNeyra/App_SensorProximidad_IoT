@@ -1,5 +1,7 @@
 package com.example.prototipoeva3.parking
 
+import com.google.firebase.Timestamp
+import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -36,6 +38,7 @@ class ParkingRecordTest {
 
     @Test
     fun parkingRecord_toMap_containsAllExpectedFields() {
+        val timestamp = Timestamp(Date(1000L))
         val record = ParkingRecord(
             id = "aparcamiento_u1_1000",
             userId = "u1",
@@ -44,7 +47,7 @@ class ParkingRecordTest {
             estado = "PELIGRO",
             ubicacionModo = "Frontal",
             nota = "Plaza A1",
-            timestamp = 1000L,
+            timestamp = timestamp,
         )
 
         val map = record.toMap()
@@ -56,6 +59,6 @@ class ParkingRecordTest {
         assertEquals("PELIGRO", map["estado"])
         assertEquals("Frontal", map["ubicacionModo"])
         assertEquals("Plaza A1", map["nota"])
-        assertEquals(1000L, map["timestamp"])
+        assertEquals(timestamp, map["timestamp"])
     }
 }

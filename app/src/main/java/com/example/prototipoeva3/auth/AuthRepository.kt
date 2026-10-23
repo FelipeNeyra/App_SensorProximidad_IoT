@@ -10,4 +10,12 @@ interface AuthRepository {
     fun currentUser(): AuthenticatedUser?
 
     fun signOut()
+
+    suspend fun checkUserExistsInAuth(email: String): Result<Boolean>
+
+    fun getLinkedSecurityUserEmail(): String?
+
+    fun linkSecurityUser(email: String)
+
+    fun unlinkSecurityUser()
 }

@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import kotlinx.coroutines.tasks.await
 
 /** Firebase SDK adapter. Credentials are passed to the SDK and never retained by this class. */
 class FirebaseAuthRepository(
@@ -35,6 +36,28 @@ class FirebaseAuthRepository(
         firebaseAuth.signOut()
     }
 
+    @Suppress("DEPRECATION")
+    override suspend fun checkUserExistsInAuth(email: String): Result<Boolean> {
+        return try {
+            val result = firebaseAuth.fetchSignInMethodsForEmail(email.trim()).await()
+            val methods = result.signInMethods
+            val exists = !methods.isNullOrEmpty()
+            Result.success(exists)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override fun getLinkedSecurityUserEmail(): String? = linkedSecurityUserEmail
+
+    override fun linkSecurityUser(email: String) {
+        linkedSecurityUserEmail = email.trim()
+    }
+
+    override fun unlinkSecurityUser() {
+        linkedSecurityUserEmail = null
+    }
+
     private fun failureKind(exception: Exception?): AuthFailureKind = when (exception) {
         is FirebaseAuthInvalidCredentialsException,
         is FirebaseAuthInvalidUserException -> AuthFailureKind.InvalidCredentials
@@ -44,5 +67,9 @@ class FirebaseAuthRepository(
 
         is FirebaseAuthException -> AuthFailureKind.ServiceUnavailable
         else -> AuthFailureKind.Unexpected
+    }
+
+    companion object {
+        var linkedSecurityUserEmail: String? = null
     }
 }
