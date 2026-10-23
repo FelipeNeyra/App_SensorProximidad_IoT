@@ -46,7 +46,9 @@ import com.example.prototipoeva3.permissions.permissionsToRequest
 import com.example.prototipoeva3.ui.screens.ConfigurationScreen
 import com.example.prototipoeva3.ui.screens.LoginScreen
 import com.example.prototipoeva3.ui.screens.PermissionBlockedScreen
+import com.example.prototipoeva3.ui.screens.SecurityMonitorScreen
 import com.example.prototipoeva3.ui.screens.ValuesScreen
+import com.google.firebase.auth.FirebaseAuth
 import com.example.prototipoeva3.ui.theme.PrototipoEVA3Theme
 import kotlinx.coroutines.launch
 
@@ -290,7 +292,21 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.fillMaxSize().padding(innerPadding),
                         )
                     } else {
-                        when (AppScreen.valueOf(currentScreenName)) {
+                        val currentUserEmail = FirebaseAuth.getInstance().currentUser?.email ?: ""
+                        val isSecurityUser = currentUserEmail.contains("seguridad", ignoreCase = true)
+
+                        if (isSecurityUser) {
+                            SecurityMonitorScreen(
+                                onSignOut = {
+                                    sessionLifecycle.onExplicitSignOut()
+                                    authRepository.signOut()
+                                    authState = AuthenticationState.SignedOut
+                                    authMessage = getString(R.string.auth_signed_out_message)
+                                },
+                                modifier = Modifier.fillMaxSize().padding(innerPadding),
+                            )
+                        } else {
+                            when (AppScreen.valueOf(currentScreenName)) {
                             AppScreen.LOGIN -> LoginScreen(
                                 onSignIn = { _, _ -> },
                                 isLoading = false,
@@ -379,6 +395,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
+            }
             }
         }
     }

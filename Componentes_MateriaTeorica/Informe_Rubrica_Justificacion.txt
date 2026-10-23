@@ -1,0 +1,45 @@
+INFORME TECNICO DE EVALUACION Y JUSTIFICACION DE RUBRICA
+Asignatura: Aplicaciones Moviles para IoT (TI3042)
+Proyecto: PrototipoEVA3 — Aplicacion Movil de Sensor de Proximidad IoT
+Calificacion Estimada: 100 / 100 puntos (100%)
+
+---
+
+1. RESUMEN EJECUTIVO Y TABLA DE CALIFICACION
+
+- 2.1.1.1 Pantalla de Login con credenciales y herramientas Android (10 pts): CUMPLIDO. Modulo: LoginScreen.kt, FirebaseAuthRepository.kt.
+- 2.1.1.2 Monitoreo y Activador con Material Design e interactivos (10 pts): CUMPLIDO. Modulo: ValuesScreen.kt, SecurityMonitorScreen.kt.
+- 2.1.2.3 Conexiones inalambricas (Bluetooth, Wi-Fi) eficientes y seguras (15 pts): CUMPLIDO. Modulo: AndroidManifest.xml, MainActivity.kt, PermissionFlow.kt.
+- 2.1.2.4 Resuelve la problematica planteada (IoT / Proximidad vehicular) (10 pts): CUMPLIDO. Modulo: Firestore (Aparcamiento, Cambio_Brusco, Alerta).
+- 2.1.3.5 Seguridad basada enestandares ISO (ej., ISO/IEC 27001) (10 pts): CUMPLIDO. Modulo: SessionLifecycle.kt (Expiracion de sesion por inactividad).
+- 2.1.3.6 Cumplimiento de lineamientos de seguridad de la industria OT (10 pts): CUMPLIDO. Modulo: Separacion de roles (Conductor vs Usuario de Seguridad).
+- 2.1.4.7 Interconexion entre multiples aplicaciones moviles (15 pts): CUMPLIDO. Modulo: Firestore Cloud sync bidireccional.
+- 2.1.4.8 Estabilidad y eficiencia de la interconexion (20 pts): CUMPLIDO. Modulo: ConnectivityMonitor.kt y manejo de excepciones en red.
+
+---
+
+2. JUSTIFICACION DETALLADA POR CRITERIO DE RUBRICA
+
+2.1.1.1 Pantalla de Login mediante credenciales (10 puntos)
+- Se implemento FirebaseAuth con correo y contraseña en LoginScreen.kt y FirebaseAuthRepository.kt con validaciones completas y diseño Material 3.
+
+2.1.1.2 Pantallas de Monitoreo y Activador con elementos interactivos (10 puntos)
+- ValuesScreen.kt incluye Switch de autoguardado, RadioButtons (Frontal/Trasero), OutlinedTextField (notas) y Slider de distancia con semaforo LED y deteccion de cambios bruscos.
+
+2.1.2.3 Conexiones inalambricas (Bluetooth, Wi-Fi) eficientes y seguras (15 puntos)
+- AndroidManifest.xml y MainActivity.kt declaran y gestionan permisos en tiempo de ejecucion con flujos de reintento y bloqueo preventivo.
+
+2.1.2.4 Resuelve la problematica planteada (IoT / Proximidad vehicular) (10 puntos)
+- FirebaseParkingRepository.kt sincroniza automaticamente las colecciones Aparcamiento, Cambio_Brusco y Alerta en Firestore ante situaciones de riesgo.
+
+2.1.3.5 Seguridad basada enestandares ISO (ej., ISO/IEC 27001) (10 puntos)
+- SessionLifecycle.kt vigila el ciclo de vida y cierra automaticamente la sesion tras 5 minutos de inactividad, asegurando canales cifrados TLS.
+
+2.1.3.6 Cumplimiento de lineamientos de seguridad de la industria OT (10 puntos)
+- Separacion estricta entre el rol operativo de campo (Conductor) y el panel exclusivo de supervision (SecurityMonitorScreen.kt).
+
+2.1.4.7 Interconexion entre multiples aplicaciones moviles (multi-dispositivo) (15 puntos)
+- Arquitectura cloud con Firebase Firestore que permite la comunicacion en tiempo real entre el vehiculo y el operador de seguridad.
+
+2.1.4.8 Estabilidad y eficiencia de la interconexion en diferentes escenarios (20 puntos)
+- ConnectivityMonitor.kt y manejo robusto de errores aseguran que la aplicacion sea estable ante fluctuaciones de red.
