@@ -21,6 +21,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,118 +42,136 @@ import com.example.prototipoeva3.R
 
 @Composable
 fun LoginScreen(
-    //Variable de captura para valores de ingreso de usuario
-    onSignIn: (email: String, password: String) -> Unit,
+    onSignIn: (email: String, password: String, isSecurity: Boolean) -> Unit,
     isLoading: Boolean,
-
-    //Mensajes de error (devueltos desde MainActivity.kt) y de conexión (Verificada en MainActivy.kt)
     message: String?,
     connectivityMessage: String,
     permissionInformation: String,
-
-    //Modifier genérico para modificar la composición de todos los elementos gráficos
     modifier: Modifier = Modifier,
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var isSecurityRole by remember { mutableStateOf(false) }
 
     val backgroundBrush = Brush.verticalGradient(
         colors = listOf(
             Color(0xFF42A5F5),
             Color(0xFF1E88E5),
-            Color(0xFF0D47A1),
-        ),
+            Color(0xFF0D47A1)
+        )
     )
 
-    //Fondo Azul - Contenedor Principal
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(backgroundBrush)
             .verticalScroll(rememberScrollState())
-            .padding(24.dp),
+            .padding(24.dp)
     ) {
-        //Columna - Contenedor de elementos gráficos
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 40.dp, bottom = 40.dp),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Título Principal: SENSOR DE PROXIMIDAD
+            // Title: SENSOR DE PROXIMIDAD
             Text(
                 text = "SENSOR DE\nPROXIMIDAD",
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontWeight = FontWeight.Black,
                     fontSize = 32.sp,
-                    letterSpacing = 1.5.sp,
+                    letterSpacing = 1.5.sp
                 ),
                 color = Color.White,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(bottom = 28.dp),
+                modifier = Modifier.padding(bottom = 28.dp)
             )
 
-            // Tarjeta Flotante (Card) - Marco de Login
+            // Floating Card Container for the form
             Card(
                 modifier = Modifier.fillMaxWidth(0.95f),
                 shape = MaterialTheme.shapes.extraLarge,
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
-                ),
+                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
+                )
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(24.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    //Subtítulo: INCIAR SESIÓN
                     Text(
                         text = stringResource(R.string.login_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = MaterialTheme.colorScheme.primary
                     )
 
-                    // Badge de Conectividad
-                    //Elementos dinámico tipo Row que cambie de color según el estado de conexión
-                    //La variable isConnected se actualiza en función de connectivityMessage
+                    // Role Selector Toggle (Conductor vs Seguridad)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Button(
+                            onClick = { isSecurityRole = false },
+                            shape = CircleShape,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (!isSecurityRole) MaterialTheme.colorScheme.primary else Color.LightGray
+                            ),
+                            modifier = Modifier.weight(1f).padding(end = 4.dp)
+                        ) {
+                            Text("Conductor", color = if (!isSecurityRole) Color.White else Color.DarkGray, fontWeight = FontWeight.Bold)
+                        }
+                        Button(
+                            onClick = { isSecurityRole = true },
+                            shape = CircleShape,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (isSecurityRole) Color(0xFF1565C0) else Color.LightGray
+                            ),
+                            modifier = Modifier.weight(1f).padding(start = 4.dp)
+                        ) {
+                            Text("Seguridad", color = if (isSecurityRole) Color.White else Color.DarkGray, fontWeight = FontWeight.Bold)
+                        }
+                    }
+
+                    // Connection Status Badge
                     val isConnected = !connectivityMessage.contains("No hay", ignoreCase = true)
                     Row(
                         modifier = Modifier
                             .clip(CircleShape)
                             .background(
-                                if (isConnected) Color(0xFFE8F5E9) else Color(0xFFFFEBEE),
+                                if (isConnected) Color(0xFFE8F5E9) else Color(0xFFFFEBEE)
                             )
                             .padding(horizontal = 12.dp, vertical = 6.dp),
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalAlignment = Alignment.CenterVertically,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(
                             modifier = Modifier
                                 .size(8.dp)
                                 .clip(CircleShape)
-                                .background(if (isConnected) Color(0xFF43A047) else Color(0xFFE53935)),
+                                .background(if (isConnected) Color(0xFF43A047) else Color(0xFFE53935))
                         )
                         Text(
                             text = if (isConnected) "Conectado a Internet" else "Sin conexión a Internet",
                             style = MaterialTheme.typography.bodySmall,
                             color = if (isConnected) Color(0xFF2E7D32) else Color(0xFFC62828),
-                            fontWeight = FontWeight.Medium,
+                            fontWeight = FontWeight.Medium
                         )
                     }
 
-                    //Campos de Ingreso - Email y Contraseña
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
                         modifier = Modifier.fillMaxWidth(),
                         label = { Text(stringResource(R.string.email_label)) },
                         singleLine = true,
-                        shape = MaterialTheme.shapes.medium,
+                        shape = MaterialTheme.shapes.medium
                     )
 
                     OutlinedTextField(
@@ -162,22 +181,32 @@ fun LoginScreen(
                         label = { Text(stringResource(R.string.password_label)) },
                         visualTransformation = PasswordVisualTransformation(),
                         singleLine = true,
-                        shape = MaterialTheme.shapes.medium,
+                        shape = MaterialTheme.shapes.medium
                     )
+
+                    TextButton(
+                        onClick = { /* Handle forgot password */ }
+                    ) {
+                        Text(
+                            text = "¿Olvidaste tu contraseña?",
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
 
                     if (message != null) {
                         Text(
                             text = message,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error,
-                            textAlign = TextAlign.Center,
+                            textAlign = TextAlign.Center
                         )
                     }
 
-                    //Botón de Ingreso - Iniciar sesión
                     Button(
                         onClick = {
-                            onSignIn(email, password)
+                            onSignIn(email, password, isSecurityRole)
                             password = ""
                         },
                         enabled = !isLoading,
@@ -186,20 +215,20 @@ fun LoginScreen(
                             .height(52.dp),
                         shape = MaterialTheme.shapes.medium,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF43A047),
-                        ),
+                            containerColor = Color(0xFF43A047)
+                        )
                     ) {
                         if (isLoading) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(24.dp),
-                                color = Color.White,
+                                color = Color.White
                             )
                         } else {
                             Text(
                                 text = "Iniciar sesión",
                                 color = Color.White,
                                 style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Bold
                             )
                         }
                     }

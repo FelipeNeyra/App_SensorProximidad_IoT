@@ -48,7 +48,7 @@ fun ConfigurationScreen(
     onValuesClick: () -> Unit,
     onSignOut: () -> Unit,
     onCheckSecurityUserExists: (email: String, onResult: (exists: Boolean) -> Unit) -> Unit = { _, _ -> },
-    onLinkSecurityUser: (email: String) -> Unit = {},
+    onLinkSecurityUser: (email: String, phone: String) -> Unit = { _, _ -> },
     onUnlinkSecurityUser: () -> Unit = {},
     linkedSecurityEmail: String? = null,
     modifier: Modifier = Modifier,
@@ -95,7 +95,7 @@ fun ConfigurationScreen(
                 }
             }
 
-            // MENU Title / Header
+            // MENU Title / Header separated and positioned cleanly
             Surface(
                 modifier = Modifier
                     .fillMaxWidth(0.85f)
@@ -117,7 +117,7 @@ fun ConfigurationScreen(
                 }
             }
 
-            // Options section (Wi-Fi, Bluetooth, Sensor)
+            // Options section with generous spacing placed lower down
             Column(
                 modifier = Modifier
                     .fillMaxWidth(0.85f)
@@ -186,16 +186,16 @@ fun ConfigurationScreen(
                 }
             }
 
-            // Security user configuration section (Vincular / Desvincular)
+            // Security user configuration fields placed further down with proper spacing
             Column(
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
-                    .padding(top = 20.dp),
+                    .padding(top = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = stringResource(R.string.security_user_title),
+                    text = "Contacto de Seguridad",
                     color = Color.White,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
@@ -277,10 +277,10 @@ fun ConfigurationScreen(
                                 onCheckSecurityUserExists(securityEmail) { exists ->
                                     isCheckingSecurityUser = false
                                     if (exists) {
-                                        onLinkSecurityUser(securityEmail)
+                                        onLinkSecurityUser(securityEmail, securityPhone)
                                         securityUserMessage = "Usuario de seguridad vinculado exitosamente."
                                     } else {
-                                        securityUserMessage = "El correo del usuario de seguridad no está registrado en Firebase Authentication."
+                                        securityUserMessage = "El correo del usuario de seguridad no es válido."
                                     }
                                 }
                             }

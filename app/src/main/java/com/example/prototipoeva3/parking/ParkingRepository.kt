@@ -32,6 +32,8 @@ interface ParkingRepository {
     suspend fun getRecentAlerts(): Result<List<AlertRecord>>
 
     suspend fun getRecentParkingRecords(): Result<List<ParkingRecord>>
+
+    suspend fun saveSecurityLink(securityEmail: String, securityPhone: String): Result<Unit>
 }
 
 class FirebaseParkingRepository(
@@ -215,6 +217,27 @@ class FirebaseParkingRepository(
                 ParkingRecord(id, userId, userEmail, distancia, estado, ubicacionModo, nota, timestamp)
             }
             Result.success(records)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun saveSecurityLink(securityEmail: String, securityPhone: String): Result<Unit> {
+        return try {
+            val user = auth.currentUser
+            val userId = user?.uid ?: "anonimo"
+            val driverEmail = user?.email ?: "no_email"
+            val data = mapOf(
+                "driverEmail" to driverEmail,
+                "securityUserEmail" to securityEmail.trim(),
+                "securityUserPhone" to securityPhone.trim(),
+                "timestamp" to Timestamp.now()
+            )
+            firestore.collection("Configuracion")
+                .document(userId)
+                .set(data)
+                .await()
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
