@@ -41,11 +41,16 @@ import com.example.prototipoeva3.R
 
 @Composable
 fun LoginScreen(
+    //Variable de captura para valores de ingreso de usuario
     onSignIn: (email: String, password: String) -> Unit,
     isLoading: Boolean,
+
+    //Mensajes de error (devueltos desde MainActivity.kt) y de conexión (Verificada en MainActivy.kt)
     message: String?,
     connectivityMessage: String,
     permissionInformation: String,
+
+    //Modifier genérico para modificar la composición de todos los elementos gráficos
     modifier: Modifier = Modifier,
 ) {
     var email by remember { mutableStateOf("") }
@@ -59,6 +64,7 @@ fun LoginScreen(
         ),
     )
 
+    //Fondo Azul - Contenedor Principal
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -66,6 +72,7 @@ fun LoginScreen(
             .verticalScroll(rememberScrollState())
             .padding(24.dp),
     ) {
+        //Columna - Contenedor de elementos gráficos
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -73,7 +80,7 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // Title: SENSOR DE PROXIMIDAD
+            // Título Principal: SENSOR DE PROXIMIDAD
             Text(
                 text = "SENSOR DE\nPROXIMIDAD",
                 style = MaterialTheme.typography.headlineLarge.copy(
@@ -86,7 +93,7 @@ fun LoginScreen(
                 modifier = Modifier.padding(bottom = 28.dp),
             )
 
-            // Floating Card Container for the form
+            // Tarjeta Flotante (Card) - Marco de Login
             Card(
                 modifier = Modifier.fillMaxWidth(0.95f),
                 shape = MaterialTheme.shapes.extraLarge,
@@ -102,6 +109,7 @@ fun LoginScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
+                    //Subtítulo: INCIAR SESIÓN
                     Text(
                         text = stringResource(R.string.login_title),
                         style = MaterialTheme.typography.titleLarge,
@@ -109,7 +117,9 @@ fun LoginScreen(
                         color = MaterialTheme.colorScheme.primary,
                     )
 
-                    // Connection Status Badge
+                    // Badge de Conectividad
+                    //Elementos dinámico tipo Row que cambie de color según el estado de conexión
+                    //La variable isConnected se actualiza en función de connectivityMessage
                     val isConnected = !connectivityMessage.contains("No hay", ignoreCase = true)
                     Row(
                         modifier = Modifier
@@ -135,6 +145,7 @@ fun LoginScreen(
                         )
                     }
 
+                    //Campos de Ingreso - Email y Contraseña
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
@@ -163,6 +174,7 @@ fun LoginScreen(
                         )
                     }
 
+                    //Botón de Ingreso - Iniciar sesión
                     Button(
                         onClick = {
                             onSignIn(email, password)

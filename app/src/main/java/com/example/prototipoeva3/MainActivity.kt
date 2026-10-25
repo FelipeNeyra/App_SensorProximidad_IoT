@@ -52,12 +52,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.example.prototipoeva3.ui.theme.PrototipoEVA3Theme
 import kotlinx.coroutines.launch
 
+//Variables de validación de intentos de solicitud de permisos
 private const val PHASE_READY = 0
 private const val PHASE_INITIAL_REQUEST = 1
 private const val PHASE_BLOCKED_RETRYABLE = 2
 private const val PHASE_RETRY_REQUEST = 3
 private const val PHASE_BLOCKED_INDEFINITELY = 4
 
+//Instancias de pantallas principales
 private enum class AppScreen {
     LOGIN,
     CONFIGURATION,
@@ -65,13 +67,19 @@ private enum class AppScreen {
 }
 
 class MainActivity : ComponentActivity() {
+    //Instancias de clases de Firebase Authenticator y Ciclo de Vida de la Sesión
     private lateinit var authRepository: AuthRepository
     private lateinit var sessionLifecycle: SessionLifecycle
+
+    //Variables de comprobación de estado de sesión
     private var onSessionExpired: (() -> Unit)? = null
     private var refreshPermissions: (() -> Unit)? = null
     private var sessionExpiredAtLaunch = false
 
+    //--- Funciones de Ciclo Principal (onCreate -> onStart -> onResume -> onStop)
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        //Inicialización de Firebase Authenticator y Sesión actual
         super.onCreate(savedInstanceState)
 
         authRepository = FirebaseAuthRepository()
@@ -83,6 +91,7 @@ class MainActivity : ComponentActivity() {
                 onSessionExpired?.invoke()
             },
         )
+        //Verificación de estado de sesión cerrada y el tiempo de inactividad expiro si la app estaba cerrada
         sessionLifecycle.checkExpirationOnLaunch()
 
         val requiredPermissions = requiredRuntimePermissions()
@@ -102,6 +111,8 @@ class MainActivity : ComponentActivity() {
                         if (initiallyGranted) PHASE_READY else PHASE_INITIAL_REQUEST,
                     )
                 }
+
+                //Validación de sesión activa y usuario ingresado para persistencia de sesión
                 var authState by remember {
                     mutableStateOf(
                         if (!sessionExpiredAtLaunch && authRepository.currentUser() != null) {
@@ -111,12 +122,16 @@ class MainActivity : ComponentActivity() {
                         },
                     )
                 }
+
+                //Mensaje de 'Expiración de Sesión' en pantalla de Login
                 var authMessage by remember {
                     mutableStateOf(
                         if (sessionExpiredAtLaunch) getString(R.string.session_expired_message)
                         else null,
                     )
                 }
+
+                //Retorno de pantalla correspondiente según autenticación o no
                 var isSigningIn by remember { mutableStateOf(false) }
                 var currentScreenName by rememberSaveable {
                     mutableStateOf(
@@ -128,6 +143,7 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
+                //Registro de cierre de sesión automático y limpieza de sus configuraciones una vez realizadas
                 DisposableEffect(Unit) {
                     onSessionExpired = {
                         authState = AuthenticationState.SignedOut
@@ -240,9 +256,11 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.fillMaxSize().padding(innerPadding),
                         )
                     } else if (!canEnterProtectedScreens(authState, permissionState)) {
+                        //Se muestra pantalla de Login si el usuario no dispone de credenciales válidas
                         LoginScreen(
                             onSignIn = { email, password ->
                                 when (validateCredentials(email, password)) {
+                                    //Validaciones locales desde AuthFlow.kt
                                     com.example.prototipoeva3.auth.CredentialsState.Empty -> {
                                         authMessage = getString(R.string.login_empty_fields)
                                     }
@@ -250,6 +268,7 @@ class MainActivity : ComponentActivity() {
                                         authMessage = getString(R.string.login_invalid_email)
                                     }
                                     com.example.prototipoeva3.auth.CredentialsState.Valid -> {
+                                        //Validación de Conectividad y Permisos (en caso de haber pasado las credenciales)
                                         if (!canSubmit(
                                                 com.example.prototipoeva3.auth.CredentialsState.Valid,
                                                 connectivityState,
@@ -264,6 +283,7 @@ class MainActivity : ComponentActivity() {
                                             } else {
                                                 null
                                             }
+                                            //Validación de credenciales en Firebase Authentication
                                             authRepository.signIn(email.trim(), password) { result ->
                                                 runOnUiThread {
                                                     isSigningIn = false
@@ -285,6 +305,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             },
+                            //Mensajes de muestra y variables de control
                             isLoading = isSigningIn,
                             message = authMessage,
                             connectivityMessage = connectivityMessage,
@@ -400,16 +421,21 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    //Función predeterminada de Inicio (Se ejecuta cada vez que la App sea abierta)
+    //Verifica el estado de la sesión (Activa o cerrada según tiempo)
     override fun onStart() {
         super.onStart()
         if (::sessionLifecycle.isInitialized) sessionLifecycle.onForeground()
     }
 
+    //Función predeterminada de Reanudar ()
     override fun onResume() {
         super.onResume()
         refreshPermissions?.invoke()
     }
 
+    //Función predeterminada de cierre (Se ejecuta cada vez que la App sea minímizada)
+    //Implementa el temporizador de 5 minutos para cerrar la sesión automáticamente
     override fun onStop() {
         if (::sessionLifecycle.isInitialized && ::authRepository.isInitialized) {
             sessionLifecycle.onBackground(authRepository.currentUser() != null)
@@ -417,6 +443,7 @@ class MainActivity : ComponentActivity() {
         super.onStop()
     }
 
+    // --- Funciones Propias ---
     private fun isPermissionGranted(permission: String): Boolean =
         ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
 
@@ -463,6 +490,7 @@ private fun permissionStateForPhase(
     else -> PermissionState.Ready
 }
 
+//Mensajes de muestra al usuario según pase su ingreso desde Firebase Authenticator
 private fun messageResource(state: AuthenticationState): Int = when (state) {
     AuthenticationState.Authenticated -> R.string.auth_success_message
     AuthenticationState.InvalidCredentials -> R.string.auth_invalid_credentials_message
