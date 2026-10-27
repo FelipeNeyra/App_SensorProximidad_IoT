@@ -13,9 +13,10 @@ interface AuthRepository {
 
     suspend fun checkUserExistsInAuth(email: String): Result<Boolean>
 
-    fun getLinkedSecurityUserEmail(): String?
+    suspend fun getLinkedSecurityUserEmail(): String?
+    suspend fun getLinkedSecurityUserPhone(): String?
 
-    fun linkSecurityUser(email: String)
+    suspend fun linkSecurityUser(email: String, phone: String)
 
-    fun unlinkSecurityUser()
+    suspend fun unlinkSecurityUser()
 }

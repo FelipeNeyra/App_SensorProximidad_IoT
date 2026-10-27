@@ -121,6 +121,9 @@ class MainActivity : ComponentActivity() {
 
                 var isSigningIn by remember { mutableStateOf(false) }
                 var isSecuritySession by rememberSaveable { mutableStateOf(false) }
+                var linkedSecurityEmail by remember { mutableStateOf<String?>(null) }
+                var linkedSecurityPhone by remember { mutableStateOf<String?>(null) }
+
                 var currentScreenName by rememberSaveable {
                     mutableStateOf(
                         if (authState == AuthenticationState.Authenticated) {
@@ -129,6 +132,16 @@ class MainActivity : ComponentActivity() {
                             AppScreen.LOGIN.name
                         },
                     )
+                }
+
+                LaunchedEffect(authState) {
+                    if (authState == AuthenticationState.Authenticated) {
+                        linkedSecurityEmail = authRepository.getLinkedSecurityUserEmail()
+                        linkedSecurityPhone = authRepository.getLinkedSecurityUserPhone()
+                    } else {
+                        linkedSecurityEmail = null
+                        linkedSecurityPhone = null
+                    }
                 }
 
                 DisposableEffect(Unit) {
@@ -384,15 +397,20 @@ class MainActivity : ComponentActivity() {
                                     },
                                     onLinkSecurityUser = { secEmail, secPhone ->
                                         coroutineScope.launch {
-                                            val repo = com.example.prototipoeva3.parking.FirebaseParkingRepository()
-                                            repo.saveSecurityLink(secEmail, secPhone)
-                                            authRepository.linkSecurityUser(secEmail)
+                                            authRepository.linkSecurityUser(secEmail, secPhone)
+                                            linkedSecurityEmail = authRepository.getLinkedSecurityUserEmail()
+                                            linkedSecurityPhone = authRepository.getLinkedSecurityUserPhone()
                                         }
                                     },
                                     onUnlinkSecurityUser = {
-                                        authRepository.unlinkSecurityUser()
+                                        coroutineScope.launch {
+                                            authRepository.unlinkSecurityUser()
+                                            linkedSecurityEmail = null
+                                            linkedSecurityPhone = null
+                                        }
                                     },
-                                    linkedSecurityEmail = authRepository.getLinkedSecurityUserEmail(),
+                                    linkedSecurityEmail = linkedSecurityEmail,
+                                    linkedSecurityPhone = linkedSecurityPhone,
                                     modifier = Modifier.fillMaxSize().padding(innerPadding),
                                 )
 

@@ -21,6 +21,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,14 +52,24 @@ fun ConfigurationScreen(
     onLinkSecurityUser: (email: String, phone: String) -> Unit = { _, _ -> },
     onUnlinkSecurityUser: () -> Unit = {},
     linkedSecurityEmail: String? = null,
+    linkedSecurityPhone: String? = null,
     modifier: Modifier = Modifier,
 ) {
     var securityEmail by rememberSaveable { mutableStateOf(linkedSecurityEmail ?: "") }
-    var securityPhone by rememberSaveable { mutableStateOf("") }
+    var securityPhone by rememberSaveable { mutableStateOf(linkedSecurityPhone ?: "") }
     var securityUserMessage by remember { mutableStateOf<String?>(null) }
     var isCheckingSecurityUser by remember { mutableStateOf(false) }
 
     val isSecurityUserLinked = !linkedSecurityEmail.isNullOrBlank()
+
+    LaunchedEffect(linkedSecurityEmail, linkedSecurityPhone) {
+        if (linkedSecurityEmail != null) {
+            securityEmail = linkedSecurityEmail
+        }
+        if (linkedSecurityPhone != null) {
+            securityPhone = linkedSecurityPhone
+        }
+    }
 
     val backgroundBrush = Brush.verticalGradient(
         colors = listOf(
